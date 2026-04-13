@@ -392,9 +392,15 @@ textarea {
 
 .action-row {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
   gap: 10px;
   margin-top: 18px;
+}
+
+.action-row-right {
+  display: flex;
+  gap: 10px;
 }
 
 .summary-view h3 {

@@ -1,7 +1,6 @@
 const MULTIPLE_DATA = Array.isArray(window.QUIZ_DATA) ? window.QUIZ_DATA : [];
 const SHORT_DATA = Array.isArray(window.SHORT_DATA) ? window.SHORT_DATA : [];
 const OPTION_LABELS = ["1", "2", "3", "4", "5", "6", "7", "8"];
-const DONT_KNOW_OPTION = "잘 모르겠음";
 const SAVED_WRONG_STORAGE_KEY = "mis-quiz-saved-wrongs-v1";
 
 function loadSavedWrongNotes() {
@@ -36,6 +35,7 @@ const state = {
   reviewLabel: null,
   savedWrongNotes: loadSavedWrongNotes(),
   savedNotesOpen: false,
+  manuallySaved: false,
 };
 
 const elements = {
@@ -58,6 +58,7 @@ const elements = {
   shortAnswer: document.getElementById("shortAnswer"),
   revealButton: document.getElementById("revealButton"),
   nextButton: document.getElementById("nextButton"),
+  saveToNotesButton: document.getElementById("saveToNotesButton"),
   summaryView: document.getElementById("summaryView"),
   setCount: document.getElementById("setCount"),
   setHint: document.getElementById("setHint"),
@@ -107,7 +108,7 @@ function questionKey(question) {
 }
 
 function getDisplayedOptions(question) {
-  return [...question.options, DONT_KNOW_OPTION];
+  return [...question.options];
 }
 
 function saveWrongNote(question, selectedIndex) {
@@ -309,7 +310,7 @@ function updateSidebar() {
   elements.setHint.textContent = state.reviewSet
     ? "고른 문제만 다시 푸는 중이에요."
     : state.mode === "multiple"
-      ? "숫자 키 1-5로 답을 고를 수 있어요."
+      ? "숫자 키 1-4로 답을 고를 수 있어요."
       : "정답 보기로 빠르게 돌려보세요.";
   renderSavedNotesPanel();
 }
@@ -502,6 +503,13 @@ function renderMultiple(question) {
   const displayedOptions = getDisplayedOptions(question);
   elements.options.replaceChildren(...displayedOptions.map((optionText, index) => createOptionButton(optionText, index, question)));
   elements.nextButton.hidden = !state.answered;
+
+  const isCorrect = state.answered && state.selectedIndex === question.answerIndex;
+  elements.saveToNotesButton.hidden = !isCorrect;
+  if (isCorrect) {
+    elements.saveToNotesButton.disabled = state.manuallySaved;
+    elements.saveToNotesButton.textContent = state.manuallySaved ? "✓ 저장됨" : "오답노트로 보내기";
+  }
 }
 
 function renderShort(question) {
@@ -573,9 +581,9 @@ function answerMultiple(selectedIndex) {
 
   const question = state.queue[state.index];
   const correct = selectedIndex === question.answerIndex;
-  const choseDontKnow = selectedIndex === question.options.length;
   state.answered = true;
   state.selectedIndex = selectedIndex;
+  state.manuallySaved = false;
 
   recordResult(question, correct, {
     selectedIndex,
@@ -590,10 +598,8 @@ function answerMultiple(selectedIndex) {
     tone: correct ? "success" : "error",
     title: correct ? "O" : "X",
     detail: correct
-      ? "정답이에요. 바로 다음 문제로 넘어가면 됩니다."
-      : choseDontKnow
-        ? `아리까리한 문제로 오답노트에 저장했어요. 정답은 ${correctAnswer}.`
-        : `정답은 ${correctAnswer}. 오답노트에 저장했어요.`,
+      ? "정답이에요. 오답노트로 보내고 싶으면 왼쪽 버튼을 누르세요."
+      : `정답은 ${correctAnswer}. 오답노트에 저장했어요.`,
   });
 
   renderQuestion();
@@ -627,6 +633,8 @@ function nextQuestion() {
   state.answered = false;
   state.selectedIndex = null;
   state.shortRevealed = false;
+  state.manuallySaved = false;
+  elements.saveToNotesButton.hidden = true;
   elements.shortInput.value = "";
   render();
 }
@@ -672,6 +680,18 @@ function bindEvents() {
     );
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
+  elements.saveToNotesButton.addEventListener("click", () => {
+    if (state.manuallySaved || !state.answered) {
+      return;
+    }
+    const question = state.queue[state.index];
+    saveWrongNote(question, state.selectedIndex);
+    state.manuallySaved = true;
+    elements.saveToNotesButton.disabled = true;
+    elements.saveToNotesButton.textContent = "✓ 저장됨";
+    updateSidebar();
+  });
+
   elements.clearNotesButton.addEventListener("click", () => {
     if (!state.savedWrongNotes.length) {
       return;
