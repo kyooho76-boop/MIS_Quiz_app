@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>경영정보론 퀴즈</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="title-wrap">
+          <p class="eyebrow">경영정보론</p>
+          <h1>문제 하나씩 퀴즈</h1>
+          <p id="modeCopy" class="mode-copy">객관식 186문제를 바로 풀 수 있어요.</p>
+        </div>
+        <figure class="study-shot">
+          <img
+            src="https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=900&q=80"
+            alt="공부 노트"
+          />
+        </figure>
+      </header>
+
+      <section class="control-strip" aria-label="설정">
+        <div class="mode-tabs" role="tablist" aria-label="문제 형식">
+          <button type="button" class="tab-button is-active" data-mode="multiple">객관식 퀴즈</button>
+          <button type="button" class="tab-button" data-mode="short">단답 카드</button>
+        </div>
+
+        <label class="filter-field">
+          <span>범위</span>
+          <select id="sourceFilter">
+            <option value="all">전체</option>
+            <option value="예상">예상</option>
+            <option value="25 기출">기출</option>
+          </select>
+        </label>
+
+        <label class="toggle-field" for="shuffleToggle">
+          <input id="shuffleToggle" type="checkbox" checked />
+          <span>섞기</span>
+        </label>
+
+        <button id="restartButton" type="button" class="ghost-button">처음부터</button>
+      </section>
+
+      <main class="workspace">
+        <section class="stage" aria-live="polite">
+          <div class="stage-meta">
+            <div class="badge-row">
+              <span id="sourceBadge" class="badge">전체</span>
+              <span id="sectionBadge" class="badge badge-muted">섹션</span>
+            </div>
+            <div class="progress-cluster">
+              <span id="progressText" class="progress-text">1 / 186</span>
+              <div class="progress-bar" aria-hidden="true">
+                <div id="progressFill" class="progress-fill"></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="questionView" class="question-view">
+            <p id="questionNumber" class="question-number">1-1</p>
+            <h2 id="questionText" class="question-text"></h2>
+            <div id="options" class="options" role="list"></div>
+
+            <div id="shortPanel" class="short-panel" hidden>
+              <label for="shortInput" class="short-label">머릿속으로 먼저 떠올리고 나서 확인해보세요.</label>
+              <textarea id="shortInput" rows="5" placeholder="여기에 잠깐 적어봐도 돼요."></textarea>
+              <div id="shortAnswer" class="short-answer" hidden></div>
+            </div>
+
+            <div id="feedback" class="feedback" hidden></div>
+          </div>
+
+          <div class="action-row">
+            <button id="revealButton" type="button" class="accent-button" hidden>정답 보기</button>
+            <button id="nextButton" type="button" class="accent-button" hidden>다음 문제</button>
+          </div>
+
+          <section id="summaryView" class="summary-view" hidden></section>
+        </section>
+
+        <aside class="sidebar">
+          <section class="sidebar-block">
+            <p class="sidebar-label">현재 세트</p>
+            <p id="setCount" class="sidebar-value">186문제</p>
+            <p id="setHint" class="sidebar-note">숫자 키 1-5로 답을 고를 수 있어요.</p>
+          </section>
+
+          <section class="sidebar-block">
+            <p class="sidebar-label">맞힌 개수</p>
+            <p id="correctCount" class="sidebar-value">0</p>
+          </section>
+
+          <section class="sidebar-block">
+            <p class="sidebar-label">정확도</p>
+            <p id="accuracyText" class="sidebar-value">0%</p>
+          </section>
+
+          <section class="sidebar-block">
+            <p class="sidebar-label">데이터</p>
+            <ul class="sidebar-list">
+              <li>객관식 <strong id="multipleTotal">0</strong></li>
+              <li>단답 <strong id="shortTotal">0</strong></li>
+              <li>이번 세트 오답 <strong id="wrongCount">0</strong></li>
+            </ul>
+          </section>
+
+          <section class="sidebar-block">
+            <p class="sidebar-label">저장된 오답노트</p>
+            <p id="savedWrongCount" class="sidebar-value">0</p>
+            <div class="sidebar-actions">
+              <button id="showNotesButton" type="button" class="ghost-button">오답노트 보기</button>
+              <button id="savedWrongQuizButton" type="button" class="ghost-button">저장 오답만</button>
+              <button id="clearNotesButton" type="button" class="ghost-button ghost-danger">비우기</button>
+            </div>
+          </section>
+        </aside>
+      </main>
+
+      <section id="savedNotesPanel" class="saved-notes" hidden></section>
+    </div>
+
+    <script src="quiz-data.js"></script>
+    <script src="short-data.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
